@@ -1,0 +1,43 @@
+# ==========================================
+# R5: Absorption Analysis (Burned Out made absorbing)
+# ==========================================
+
+# Absorbing variant of P (used for R5 only)
+P_abs = P.copy()
+P_abs[2] = [0, 0, 1]
+assert np.allclose(P_abs.sum(axis=1), 1.0), "Invalid absorbing matrix!"
+
+print("Absorbing Transition Matrix P_abs:")
+display(pd.DataFrame(P_abs, index=STATES, columns=STATES))
+
+transient = STATES[:2]
+absorbing = STATES[2:]
+
+# Canonical form blocks
+Q = P_abs[:2, :2]   # transient -> transient
+R = P_abs[:2, 2:]   # transient -> absorbing
+
+print("Q:")
+display(pd.DataFrame(Q, index=transient, columns=transient))
+print("R:")
+display(pd.DataFrame(R, index=transient, columns=absorbing))
+
+# Fundamental matrix
+N = np.linalg.inv(np.eye(2) - Q)
+print("N = (I - Q)^-1:")
+display(pd.DataFrame(N, index=transient, columns=transient))
+
+# Absorption probabilities
+B = N @ R
+print("B = N R:")
+display(pd.DataFrame(B, index=transient, columns=absorbing))
+
+# Expected steps to burnout
+t = N @ np.ones(2)
+print("Expected weeks until Burned Out (t = N 1):")
+display(pd.DataFrame({"Expected Weeks": t}, index=transient))
+
+# Verification
+assert np.allclose(B.sum(axis=1), 1.0)
+assert np.allclose(t, N.sum(axis=1))
+print("R5 verified: each row of B sums to 1 and t equals the row sums of N.")
