@@ -7,7 +7,8 @@ P_abs = P.copy()
 P_abs[2] = [0, 0, 1]
 assert np.allclose(P_abs.sum(axis=1), 1.0), "Invalid absorbing matrix!"
 
-print("Absorbing Transition Matrix P_abs:")
+# States are already ordered: transient first, absorbing last
+print("Canonical form of P_abs = [[Q, R], [0, I]]  (transient first, Burned Out last):")
 display(pd.DataFrame(P_abs, index=STATES, columns=STATES))
 
 transient = STATES[:2]
